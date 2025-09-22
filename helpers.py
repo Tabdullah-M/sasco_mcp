@@ -20,8 +20,7 @@ def read_fuel_station_records(city: str = None) -> List[Dict[str, Any]]:
         - district: The district (الحي) where the station is located
         - region: The region from the Excel file
     """
-    current_dir = Path(__file__).parent
-    records_path = current_dir / "data"    
+    records_path = "data"    
     # Read the specific الوسطى file
     excel_file = records_path / "محطات- الوسطى.xlsx"
     if not excel_file.exists():
