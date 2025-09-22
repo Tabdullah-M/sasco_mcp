@@ -8,7 +8,7 @@ def read_fuel_station_records(city: str = None) -> List[Dict[str, Any]]:
     Read fuel station records from the الوسطى Excel file and optionally filter by region.
     
     Args:
-        region: Specific region to filter by (e.g., 'Central', 'East'). If None, returns all stations.
+        city: Specific city to filter by (e.g., 'Riyadh'). If None, returns all stations.
         
     Returns:
         List of dictionaries containing fuel station data with the following fields:
@@ -20,7 +20,8 @@ def read_fuel_station_records(city: str = None) -> List[Dict[str, Any]]:
         - district: The district (الحي) where the station is located
         - region: The region from the Excel file
     """
-    records_path = "data"    
+    current_dir = Path(__file__).parent
+    records_path = current_dir / "data"    
     # Read the specific الوسطى file
     excel_file = records_path / "محطات- الوسطى.xlsx"
     if not excel_file.exists():
@@ -50,8 +51,8 @@ def read_fuel_station_records(city: str = None) -> List[Dict[str, Any]]:
                 
             }
             # If the station is out of service (status is False) skip it 
-            if station_data['station_status'].lower() == 'Not Working'.lower():
-                break 
+            if station_data['station_status'] and station_data['station_status'].lower() == 'not working':
+                continue  # Skip this station but continue processing others
 
             # Filter by city if specified
             if city and station_data['city']:
@@ -83,7 +84,7 @@ def _get_column_value(row: pd.Series, possible_columns: List[str]) -> Any:
             return row[col]
     return None
 
-def _normalize_boolean(value: Any) -> Optional[bool]:
+def _normalize_boolean(value: Any) -> Optional[str]:
     """
     Normalize various boolean representations to True/False/None.
     
@@ -126,9 +127,9 @@ def _normalize_status(value: Any) -> Optional[str]:
     
     if isinstance(value, str):
         value = value.lower().strip()
-        if value in ['working', 'active', 'يعمل', 'نشط', 'فعال', 'Automated', 'automated']:
+        if value in ['working', 'active', 'يعمل', 'نشط', 'فعال', 'automated', 'automated']:
             return 'Working'
-        elif value in ['not working', 'inactive', 'لا يعمل', 'غير نشط', 'معطل', 'Not Automated', 'not automated']:
+        elif value in ['not working', 'inactive', 'لا يعمل', 'غير نشط', 'معطل', 'not automated', 'not automated']:
             return 'Not Working'
     
     return str(value)
@@ -140,7 +141,7 @@ if __name__ == '__main__':
     
     try:
         # Test 1: read_fuel_station_records() with specific region
-        print("1. Testing read_fuel_station_records() with region 'Central'...")
+        print("1. Testing read_fuel_station_records() with city 'Riyadh'...")
         stations = read_fuel_station_records('Riyadh')
         print(f"Found {len(stations)} stations total")
         
@@ -153,4 +154,4 @@ if __name__ == '__main__':
         
     except Exception as e:
         print(f"Error testing read_fuel_station_records(): {e}")
-        print("-" * 30) 
+        print("-" * 30)
