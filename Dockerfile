@@ -21,7 +21,7 @@ RUN pip install --no-cache-dir -e .
 
 # Copy application files
 COPY *.py ./
-COPY records/ ./records/
+COPY data/ ./data/
 
 # Expose port
 EXPOSE 8000
